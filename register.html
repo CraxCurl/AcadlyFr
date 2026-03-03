@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Registration | Acadly</title>
+    <link rel="icon" type="image/jpeg" href="icon.jpeg">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            width: 1050px;
+            height: 650px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Side - Welcome Section */
+        .welcome-side {
+            flex: 1.2;
+            background: linear-gradient(135deg, #475BE8 0%, #A259FF 100%);
+            padding: 80px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-side h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            line-height: 1.1;
+        }
+
+        .welcome-side p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Design Elements */
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            transform: rotate(-45deg);
+            z-index: -1;
+        }
+        .shape-1 { width: 250px; height: 50px; bottom: 10%; left: -20px; background: linear-gradient(90deg, #FF9F2D, #F45252); }
+        .shape-2 { width: 200px; height: 45px; bottom: 20%; left: 50px; background: linear-gradient(90deg, #FF9F2D, #F45252); opacity: 0.7; }
+        .shape-3 { width: 150px; height: 40px; bottom: 5%; left: 120px; background: linear-gradient(90deg, #FF9F2D, #F45252); opacity: 0.5; }
+
+        /* Right Side - Register Section */
+        .selection-side {
+            flex: 1;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: white;
+        }
+
+        .selection-side h2 {
+            color: #475BE8;
+            font-weight: 800;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .selection-side p {
+            color: var(--text-body);
+            margin-bottom: 40px;
+            font-size: 1rem;
+        }
+
+        .auth-links {
+            margin-top: 25px;
+            font-size: 0.95rem;
+            text-align: center;
+            color: var(--text-body);
+        }
+
+        @media (max-width: 1100px) {
+            .main-container { width: 95%; height: auto; flex-direction: column; max-height: 95vh; overflow-y: auto; }
+            .welcome-side { padding: 40px; }
+            .selection-side { padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Left Side -->
+        <div class="welcome-side">
+            <a href="index.html" style="color: white; text-decoration: none; font-weight: 700; margin-bottom: 20px; display: inline-block;">← Back</a>
+            <h1>Join Acadly</h1>
+            <p>Create your professional teacher profile today and experience the most efficient way to manage your students and classes.</p>
+
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+
+        <!-- Right Side -->
+        <div class="selection-side">
+            <h2>Create Account</h2>
+            <p>Fill in the details below to get started.</p>
+
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="email">Work Email</label>
+                    <input type="email" id="email" required placeholder="name@university.edu">
+                </div>
+                <div class="form-group">
+                    <label for="password">Create Password</label>
+                    <input type="password" id="password" required placeholder="••••••••" minlength="6">
+                </div>
+
+                <div id="error-message" style="color: var(--danger); margin-bottom: 1.5rem; display: none; font-size: 0.85rem; font-weight: 600; background: #FFF0F0; padding: 12px; border-radius: 10px; border: 1px solid rgba(244, 82, 82, 0.2);"></div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 18px; border-radius: 12px;">Create Profile</button>
+            </form>
+
+            <p class="auth-links">
+                Already have an account? <a href="login.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">Login here</a>
+            </p>
+        </div>
+    </div>
+    <script type="module" src="js/register.js"></script>
+</body>
+</html>

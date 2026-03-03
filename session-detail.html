@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Detail | Acadly</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .detail-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 3rem;
+        }
+
+        .list-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .student-item {
+            background: #FFFFFF;
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .student-item.is-present {
+            border-left: 5px solid var(--success);
+        }
+
+        .student-item.is-absent {
+            border-left: 5px solid var(--danger);
+        }
+
+        .student-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        @media (max-width: 768px) {
+            .detail-stats-grid { grid-template-columns: 1fr; }
+            .list-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body style="padding: 40px; background: var(--bg-main);">
+    <div class="panel" style="max-width: 1100px; margin: 0 auto; min-height: 80vh;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 3rem;">
+            <div>
+                <h1 id="detail-title" style="margin: 0; font-size: 2.5rem; color: var(--primary); letter-spacing: -1px;">Attendance Report</h1>
+                <p id="detail-subtitle" style="color: var(--text-body); margin-top: 8px; font-weight: 500; font-size: 1.1rem;">Loading session data...</p>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button onclick="window.print()" class="btn btn-secondary" style="width: auto; background: white; border: 1px solid var(--border-light);">Print Report</button>
+                <button onclick="window.close()" class="btn btn-primary" style="width: auto;">Close Report</button>
+            </div>
+        </div>
+
+        <div class="detail-stats-grid">
+            <div class="stat-card" style="background: #f0fff4; border-color: #c6f6d5;">
+                <span id="stat-present" class="stat-value" style="color: #2f855a;">0</span>
+                <span class="stat-label">Present Students</span>
+            </div>
+            <div class="stat-card" style="background: #fff5f5; border-color: #fed7d7;">
+                <span id="stat-absent" class="stat-value" style="color: #c53030;">0</span>
+                <span class="stat-label">Absent Students</span>
+            </div>
+            <div class="stat-card" style="background: var(--primary-soft); border-color: #e0e7ff;">
+                <span id="stat-total" class="stat-value">0</span>
+                <span class="stat-label">Total Strength</span>
+            </div>
+        </div>
+
+        <div class="list-container">
+            <div>
+                <div class="section-header">
+                    <h3 style="margin: 0; color: var(--success); font-weight: 800;">Present</h3>
+                </div>
+                <ul id="present-detail-list" style="list-style: none;"></ul>
+            </div>
+            <div>
+                <div class="section-header">
+                    <h3 style="margin: 0; color: var(--danger); font-weight: 800;">Absent</h3>
+                </div>
+                <ul id="absent-detail-list" style="list-style: none;"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from './js/firebase.js';
+        import { ref, get, child } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const sessionId = localStorage.getItem('viewSessionId');
+            const slotName = localStorage.getItem('viewSlotName');
+            if (!sessionId) return;
+
+            try {
+                const dbRef = ref(db);
+
+                // Get Session Data
+                const sessionSnap = await get(child(dbRef, `sessions/${sessionId}`));
+                if (!sessionSnap.exists()) return;
+                const sessionData = sessionSnap.val();
+
+                // Get Registered Students FOR THIS SPECIFIC SLOT
+                const registrySnap = await get(child(dbRef, `teachers/${user.uid}/classes/${slotName}/students`));
+                const classRegistry = registrySnap.exists() ? registrySnap.val() : {};
+
+                // UI Header
+                document.getElementById('detail-title').textContent = `${slotName} Report`;
+                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const startTime = new Date(sessionData.startTime);
+                document.getElementById('detail-subtitle').textContent = startTime.toLocaleDateString(undefined, dateOptions) + " at " + startTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                const presentStudents = sessionData.attendance || {};
+                const presentList = document.getElementById('present-detail-list');
+                const absentList = document.getElementById('absent-detail-list');
+
+                let presentCount = 0;
+                let absentCount = 0;
+
+                // Process comparison based on slot-specific registry
+                const sortedRegistry = Object.entries(classRegistry).sort((a, b) => a[0].localeCompare(b[0]));
+
+                sortedRegistry.forEach(([id, info]) => {
+                    const isPresent = presentStudents[id];
+                    const li = document.createElement('li');
+                    li.className = `student-item ${isPresent ? 'is-present' : 'is-absent'}`;
+                    li.innerHTML = `
+                        <div class="flagged-info">
+                            <span class="flagged-id" style="font-size: 1.05rem;">${id}</span>
+                            <div class="flagged-time" style="font-size: 0.9rem;">${info.name}</div>
+                        </div>
+                        <span class="status-tag ${isPresent ? 'present' : 'flagged'}" style="font-size: 0.65rem;">${isPresent ? 'Present' : 'Absent'}</span>
+                    `;
+
+                    if (isPresent) {
+                        presentList.appendChild(li);
+                        presentCount++;
+                    } else {
+                        absentList.appendChild(li);
+                        absentCount++;
+                    }
+                });
+
+                // Update Stats
+                document.getElementById('stat-present').textContent = presentCount;
+                document.getElementById('stat-absent').textContent = absentCount;
+                document.getElementById('stat-total').textContent = sortedRegistry.length;
+
+            } catch (e) {
+                console.error(e);
+            }
+        });
+    </script>
+</body>
+</html>

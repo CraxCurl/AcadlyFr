@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acadly | Smart Attendance</title>
+    <link rel="icon" type="image/jpeg" href="icon.jpeg">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            width: 1050px;
+            height: 650px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Left Side - Welcome Section */
+        .welcome-side {
+            flex: 1.2;
+            background: linear-gradient(135deg, #475BE8 0%, #A259FF 100%);
+            padding: 80px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-side h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            line-height: 1.1;
+        }
+
+        .welcome-side p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Design Elements (The colored pills/shapes) */
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            transform: rotate(-45deg);
+            z-index: -1;
+        }
+
+        .shape-1 { width: 250px; height: 50px; bottom: 10%; left: -20px; background: linear-gradient(90deg, #FF9F2D, #F45252); }
+        .shape-2 { width: 200px; height: 45px; bottom: 20%; left: 50px; background: linear-gradient(90deg, #FF9F2D, #F45252); opacity: 0.7; }
+        .shape-3 { width: 150px; height: 40px; bottom: 5%; left: 120px; background: linear-gradient(90deg, #FF9F2D, #F45252); opacity: 0.5; }
+
+        /* Right Side - Selection Section */
+        .selection-side {
+            flex: 1;
+            padding: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .selection-side h2 {
+            color: #475BE8;
+            font-weight: 800;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .selection-side p {
+            color: var(--text-body);
+            margin-bottom: 50px;
+            font-size: 1rem;
+        }
+
+        .options-group {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 22px;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border: 2px solid transparent;
+        }
+
+        .teacher-opt {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 10px 20px rgba(71, 91, 232, 0.2);
+        }
+
+        .teacher-opt:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(71, 91, 232, 0.3);
+        }
+
+        .student-opt {
+            background: white;
+            color: #475BE8;
+            border-color: #475BE8;
+        }
+
+        .student-opt:hover {
+            background: #f8f9ff;
+            transform: translateY(-3px);
+        }
+
+        .student-opt span {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            font-weight: 400;
+        }
+
+        @media (max-width: 1100px) {
+            .main-container { width: 95%; height: auto; flex-direction: column; max-height: 95vh; overflow-y: auto; }
+            .welcome-side { padding: 40px; }
+            .selection-side { padding: 40px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Left Side -->
+        <div class="welcome-side">
+            <h1>Welcome to Acadly</h1>
+            <p>Experience the next generation of smart attendance and classroom interaction. Streamlined, real-time, and built for modern education.</p>
+
+            <!-- Visual Shapes -->
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+
+        <!-- Right Side -->
+        <div class="selection-side">
+            <h2>Select Role</h2>
+            <p>Please choose your access method to continue.</p>
+
+            <div class="options-group">
+                <a href="login.html" class="option-btn teacher-opt">
+                    I am a Teacher
+                </a>
+
+                <!-- This will trigger a download -->
+                <a href="Acadly.apk" download class="option-btn student-opt">
+                    <div>
+                        I am a Student
+                        <br>
+                        <span>Download Mobile App (APK)</span>
+                    </div>
+                </a>
+            </div>
+
+            <div style="margin-top: 50px; opacity: 0.5; font-size: 0.9rem; color: var(--text-body);">
+                Powered by Team DIGIX
+            </div>
+        </div>
+    </div>
+</body>
+</html>

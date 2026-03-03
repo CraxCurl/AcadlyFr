@@ -1,0 +1,445 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* Light Mode Variables */
+    --primary: #475BE8;
+    --primary-soft: rgba(71, 91, 232, 0.1);
+    --primary-gradient: linear-gradient(135deg, #475BE8 0%, #2F41C7 100%);
+    --bg-main: #F4F7FE;
+    --panel-white: #FFFFFF;
+    --text-heading: #11142D;
+    --text-body: #808191;
+    --success: #2ED480;
+    --danger: #F45252;
+    --border-light: #E4E4E4;
+    --radius-xl: 30px;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --shadow-premium: 0px 20px 50px rgba(0, 0, 0, 0.05);
+    --shadow-glow: 0px 10px 30px rgba(71, 91, 232, 0.15);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --acadly-logo: #475BE8;
+}
+
+/* Dark Mode Variables */
+[data-theme="dark"] {
+    --bg-main: #0B1437;
+    --panel-white: #111C44;
+    --text-heading: #FFFFFF;
+    --text-body: #A3AED0;
+    --border-light: rgba(255, 255, 255, 0.1);
+    --shadow-premium: 0px 20px 50px rgba(0, 0, 0, 0.3);
+    --primary-soft: rgba(71, 91, 232, 0.2);
+    --primary: #707EFA;
+    --acadly-logo: #FFFFFF;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-heading);
+    line-height: 1.6;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Background Accents */
+body::before {
+    content: '';
+    position: fixed;
+    top: -10%;
+    right: -10%;
+    width: 40%;
+    height: 40%;
+    background: radial-gradient(circle, rgba(71, 91, 232, 0.05) 0%, transparent 70%);
+    z-index: -1;
+}
+
+/* Auth Cards Redesign */
+.centered-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    min-height: 100vh;
+}
+
+.auth-card {
+    background: var(--panel-white);
+    padding: 4rem 3rem;
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 480px;
+    box-shadow: var(--shadow-premium);
+    border: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.auth-card h1 {
+    font-size: 2.75rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--acadly-logo);
+    margin-bottom: 0.5rem;
+}
+
+.auth-card p {
+    color: var(--text-body);
+    margin-bottom: 3rem;
+    font-weight: 500;
+}
+
+/* Advanced Inputs */
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-heading);
+    margin-bottom: 10px;
+    display: block;
+    margin-left: 5px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 16px 20px;
+    background: var(--bg-main);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    transition: var(--transition);
+    color: var(--text-heading);
+    font-weight: 500;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0px 10px 25px rgba(71, 91, 232, 0.06);
+}
+
+/* Premium Buttons */
+.btn {
+    padding: 16px 30px;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: var(--shadow-glow);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-4px);
+    box-shadow: 0px 15px 40px rgba(71, 91, 232, 0.25);
+}
+
+.btn-primary:disabled {
+    background: #D1D1D1;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn-secondary {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: #FFFFFF;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:hover {
+    background: rgba(71, 91, 232, 0.15);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: #FFF0F0;
+    color: var(--danger);
+}
+
+[data-theme="dark"] .btn-danger {
+    background: rgba(244, 82, 82, 0.1);
+    color: #FF8080;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: var(--danger);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Header Glassmorphism */
+header {
+    background: var(--panel-white);
+    backdrop-filter: blur(20px);
+    padding: 1.25rem 5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+header h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--acadly-logo);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logout-btn {
+    padding: 10px 20px !important;
+    font-size: 0.9rem !important;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+    background: var(--primary-soft);
+    border: 1px solid var(--border-light);
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+[data-theme="dark"] .theme-toggle-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: #FFFFFF;
+}
+
+.theme-toggle-btn:hover {
+    transform: scale(1.1);
+    background: var(--border-light);
+}
+
+/* Sidebar & Dashboard Layout */
+main.dashboard-container {
+    max-width: 1440px;
+    margin: 3.5rem auto;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 35px;
+    padding: 0 5rem;
+}
+
+.panel {
+    background: var(--panel-white);
+    padding: 2.5rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-premium);
+    border: 1px solid var(--border-light);
+}
+
+.panel h2 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 2rem;
+}
+
+/* Navigation Buttons */
+#dashboard-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-btn {
+    width: 100%;
+    padding: 16px 20px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-body);
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-btn.active {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+/* QR Section */
+.qr-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.session-controls {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0;
+    justify-content: flex-start;
+}
+
+#qrcode-wrapper {
+    background: #FFFFFF;
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.05);
+    margin: 2rem 0;
+    border: 1px solid var(--border-light);
+    align-self: center;
+}
+
+/* Stats */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 2.5rem;
+    width: 100%;
+}
+
+.stat-card {
+    background: var(--bg-main);
+    padding: 2rem 1.5rem;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    border: 1px solid var(--border-light);
+}
+
+.stat-value {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+/* History Cards */
+.history-card {
+    margin-bottom: 16px;
+    padding: 1.5rem 2rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+    background: var(--panel-white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: var(--transition);
+    position: relative;
+}
+
+.history-card:hover {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-premium);
+    border-color: var(--primary);
+}
+
+.delete-history-btn {
+    padding: 8px 18px !important;
+    font-size: 0.75rem !important;
+    background: #FFF0F0 !important;
+    color: var(--danger) !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: var(--transition) !important;
+}
+
+.delete-history-btn:hover {
+    background: var(--danger) !important;
+    color: white !important;
+    transform: translateY(-2px);
+}
+
+.flagged-list {
+    list-style: none;
+    padding: 0;
+}
+
+.flagged-item {
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--panel-white);
+    transition: var(--transition);
+}
+
+.flagged-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.05);
+    border-color: var(--primary);
+}
+
+.status-tag {
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-tag.present { background: #E9FBF3; color: var(--success); }
+.status-tag.manual { background: #F0F2FF; color: var(--primary); }
+
+/* Tabs */
+.tab-pane {
+    display: none;
+}
+.tab-pane.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1200px) {
+    main.dashboard-container { grid-template-columns: 1fr; }
+    header { padding: 1rem 2rem; }
+}

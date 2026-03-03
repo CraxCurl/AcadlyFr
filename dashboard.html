@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard | Acadly</title>
+    <link rel="icon" type="image/jpeg" href="icon.jpeg">
+    <link rel="stylesheet" href="css/style.css">
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Excel Parsing Library -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+    <header>
+        <div style="display: flex; align-items: baseline; gap: 10px;">
+            <h1>Acadly</h1>
+            <span style="font-size: 0.9rem; font-weight: 600; color: var(--text-body); opacity: 0.8;">for Teachers</span>
+        </div>
+        <div class="user-info">
+            <span id="teacher-email" style="font-weight: 700; color: var(--text-heading);">Loading...</span>
+            <div style="display: flex; align-items: center; gap: 12px; margin-left: 10px;">
+                <button id="doubt-counter-btn" class="btn btn-secondary" style="position: relative; padding: 10px 15px; background: var(--primary-soft); border-color: var(--primary);">
+                    💬 Doubts <span id="doubt-count-badge" style="position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; border-radius: 50%; padding: 2px 6px; font-size: 0.7rem; font-weight: bold; display: none;">0</span>
+                </button>
+                <button id="logout-btn" class="btn btn-secondary logout-btn">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-container" style="grid-template-columns: 280px 1fr;">
+        <!-- Sidebar Navigation -->
+        <aside class="panel" style="padding: 2rem 1.5rem;">
+            <nav id="dashboard-nav">
+                <button class="nav-btn active" data-tab="attendance-tab">📅 Attendance</button>
+                <button class="nav-btn" data-tab="announcements-tab">📢 Announcements</button>
+                <button class="nav-btn" data-tab="history-tab">📊 Class History</button>
+                <button class="nav-btn" data-tab="students-tab">👥 Student Registry</button>
+                <button class="nav-btn" data-tab="leaderboard-tab">🏆 Leaderboard</button>
+                <button class="nav-btn" data-tab="settings-tab">⚙️ Settings</button>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div id="tab-content">
+            <!-- Attendance Tab -->
+            <section id="attendance-tab" class="tab-pane active">
+                <div class="panel">
+                    <h2>Live Attendance Session</h2>
+                    <div class="qr-section">
+                        <div id="slot-container" class="form-group" style="width: 100%; max-width: 500px; margin-bottom: 1.5rem;">
+                            <label for="session-slot">Select Class / Slot</label>
+                            <input type="text" id="session-slot" list="class-list-options" placeholder="e.g. Mathematics 101">
+                            <datalist id="class-list-options"></datalist>
+                        </div>
+
+                        <div class="session-controls" style="margin-bottom: 2rem;">
+                            <button id="start-btn" class="btn btn-primary">Start New Session</button>
+                            <button id="end-btn" class="btn btn-danger" disabled>End Session</button>
+                        </div>
+
+                        <div id="qrcode-wrapper" style="display: none;">
+                            <div id="qrcode"></div>
+                            <p id="session-status-msg" style="margin-top: 1rem; font-weight: 600; color: var(--primary);">Active Session</p>
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <span id="timer-display" class="stat-value">05:00</span>
+                                <span class="stat-label">Timer</span>
+                            </div>
+                            <div class="stat-card">
+                                <span id="student-count" class="stat-value">0</span>
+                                <span class="stat-label">Present</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="session-summary" style="margin-top: 3rem; border-top: 1px solid var(--border-light); padding-top: 2rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h3>Attendance Log</h3>
+                            <div style="display: flex; gap: 10px;">
+                                <button id="add-manual-btn" class="btn btn-secondary" style="width: auto; padding: 10px 15px;">+ Manual</button>
+                                <button id="publish-btn" class="btn btn-primary" style="width: auto; padding: 10px 15px;">Publish List</button>
+                            </div>
+                        </div>
+
+                        <div id="manual-entry-form" style="display: none; margin-bottom: 1.5rem;">
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="manual-student-id" placeholder="Enter Register Number">
+                                <button id="submit-manual-btn" class="btn btn-primary" style="width: auto;">Add</button>
+                            </div>
+                        </div>
+
+                        <ul id="present-list" class="flagged-list"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Announcements Tab -->
+            <section id="announcements-tab" class="tab-pane">
+                <div class="panel">
+                    <h2>Send Announcement</h2>
+                    <p style="color: var(--text-body); margin-bottom: 2rem;">Broadcast a message to students in a specific slot or all classes.</p>
+
+                    <div class="form-group">
+                        <label>Select Target Class / Slot</label>
+                        <select id="announcement-slot-select" class="form-control" style="width: 100%; padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--border-light); background: var(--bg-main); color: var(--text-heading); font-weight: 600;">
+                            <option value="All Classes">Broadcast to All My Classes</option>
+                            <!-- Options populated via JS -->
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="announcement-title" placeholder="e.g. Tomorrow's Assignment">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Message / Notes</label>
+                        <textarea id="announcement-body" style="width: 100%; height: 120px; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-light); font-family: inherit;" placeholder="Type your message here..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Attachment (PDF, Image, etc.)</label>
+                        <input type="file" id="announcement-file" class="btn-secondary" style="width: 100%; padding: 10px; background: var(--bg-main);">
+                    </div>
+
+                    <button id="send-announcement-btn" class="btn btn-primary">Publish Announcement</button>
+
+                    <div style="margin-top: 3rem;">
+                        <h3>Recent Announcements</h3>
+                        <ul id="announcements-list" class="flagged-list"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Tab -->
+            <section id="history-tab" class="tab-pane">
+                <div class="panel">
+                    <h2>Class Attendance History</h2>
+                    <p style="color: var(--text-body); margin-bottom: 2rem;">View and manage previous attendance records.</p>
+
+                    <div id="history-list" class="flagged-list">
+                        <!-- History items will be loaded here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Student Registry Tab -->
+            <section id="students-tab" class="tab-pane">
+                <div class="panel">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <div>
+                            <h2>Student Registry</h2>
+                            <p style="color: var(--text-body);">Organize students by Class/Slot to track absenteeism.</p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <label for="excel-upload" class="btn btn-secondary" style="width: auto; padding: 10px 20px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                                📊 Upload Excel
+                                <input type="file" id="excel-upload" accept=".xlsx, .xls" style="display: none;">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="add-student-form" style="margin-bottom: 2rem; background: var(--bg-main); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-light);">
+                        <h3 style="margin-bottom: 1rem; font-size: 1rem;">Add New Student</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Class / Slot Name</label>
+                                <input type="text" id="reg-slot-name" placeholder="e.g. Mathematics 101">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Register Number</label>
+                                <input type="text" id="reg-student-id" placeholder="e.g. 2021001">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label>Full Name</label>
+                                <input type="text" id="reg-student-name" placeholder="e.g. John Doe">
+                            </div>
+                            <button id="register-student-btn" class="btn btn-primary" style="width: auto;">Add Student</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem;">
+                        <h3>Registry by Class</h3>
+                        <div id="registered-classes-container">
+                            <!-- Class groups will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leaderboard Tab -->
+            <section id="leaderboard-tab" class="tab-pane">
+                <div class="panel">
+                    <div id="leaderboard-main-view">
+                        <h2>Attendance Leaderboard</h2>
+                        <p style="color: var(--text-body); margin-bottom: 2.5rem;">Select a course to view student rankings.</p>
+                        <div id="leaderboard-courses-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+                            <!-- Dynamically populated with course cards -->
+                        </div>
+                    </div>
+
+                    <div id="leaderboard-rankings-view" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                            <div>
+                                <h2 id="selected-course-title" style="margin: 0;">Course Name</h2>
+                                <p style="color: var(--text-body); margin-top: 5px;">Student Rankings by Attendance</p>
+                            </div>
+                            <button id="back-to-courses-btn" class="btn btn-secondary" style="width: auto;">← Back to Courses</button>
+                        </div>
+                        <div id="leaderboard-list-container">
+                            <!-- Rankings will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Tab -->
+            <section id="settings-tab" class="tab-pane">
+                <div class="panel">
+                    <h2>Settings</h2>
+                    <p style="color: var(--text-body); margin-bottom: 2.5rem;">Manage your account preferences and security.</p>
+
+                    <div style="margin-bottom: 3rem;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">Account Information</h3>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="text" id="settings-email" disabled style="background: var(--bg-main); cursor: not-allowed; color: var(--text-heading); font-weight: 600;">
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 3rem;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">Security</h3>
+                        <div id="password-reset-form">
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <input type="password" id="current-password" placeholder="••••••••">
+                            </div>
+                            <div class="form-group">
+                                <label>New Password</label>
+                                <input type="password" id="new-password" placeholder="••••••••">
+                            </div>
+                            <button id="update-password-btn" class="btn btn-primary" style="width: auto;">Update Password</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 3rem;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">Appearance</h3>
+                        <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-main); padding: 1.5rem; border-radius: var(--radius-lg);">
+                            <div>
+                                <strong id="theme-status-text" style="display: block;">Dark Mode</strong>
+                                <span id="theme-sub-text" style="font-size: 0.85rem; color: var(--text-body);">Enable dark mode for eye comfort.</span>
+                            </div>
+                            <button id="theme-toggle" class="theme-toggle-btn">🌙</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 3rem;">
+                        <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem;">Active Classes / Slots</h3>
+                        <div id="settings-classes-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
+                            <!-- List of classes will be populated here -->
+                        </div>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-light); padding-top: 2rem;">
+                        <button id="about-btn" class="btn btn-secondary" style="width: auto;">About Acadly</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Student Doubts Modal -->
+    <div id="doubts-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; backdrop-filter: blur(5px);">
+        <div class="panel" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                <div>
+                    <h2 style="margin: 0; font-size: 1.5rem; color: var(--primary);">Student Doubts</h2>
+                    <p style="color: var(--text-body); margin-top: 5px;">Manage and resolve student queries</p>
+                </div>
+                <button id="close-doubts-modal-btn" class="btn btn-secondary" style="width: auto; padding: 10px 15px;">Close</button>
+            </div>
+
+            <div id="doubts-list-view">
+                <ul id="doubts-list" class="flagged-list">
+                    <!-- Doubts will be populated here -->
+                </ul>
+            </div>
+
+            <div id="doubt-detail-view" style="display: none;">
+                <button id="back-to-doubts-list-btn" class="btn btn-secondary" style="width: auto; margin-bottom: 1.5rem; font-size: 0.8rem;">← Back to List</button>
+
+                <div style="background: var(--bg-main); padding: 1.5rem; border-radius: var(--radius-lg); margin-bottom: 2rem; border: 1px solid var(--border-light);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div>
+                            <strong id="doubt-student-name" style="color: var(--primary);">Student Name</strong>
+                            <span id="doubt-slot-name" class="status-tag present" style="font-size: 0.7rem; margin-left: 10px;">Slot Name</span>
+                        </div>
+                        <span id="doubt-student-id" class="status-tag manual" style="font-size: 0.7rem;">Register No</span>
+                    </div>
+                    <p id="doubt-text" style="color: var(--text-heading); font-size: 1rem; line-height: 1.6; white-space: pre-wrap; margin-bottom: 10px;">Doubt content...</p>
+
+                    <div id="doubt-attachment-container" style="display: none; margin-top: 15px; margin-bottom: 15px;">
+                        <p style="font-size: 0.8rem; color: var(--text-body); margin-bottom: 8px;">Attached Image:</p>
+                        <img id="doubt-attachment-img" src="" alt="Doubt Attachment" style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-light); cursor: pointer;">
+                    </div>
+
+                    <small id="doubt-timestamp" style="color: var(--text-muted);"></small>
+                </div>
+
+                <div class="form-group">
+                    <label>Solution / Response</label>
+                    <textarea id="doubt-solution-input" style="width: 100%; height: 150px; padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-light); font-family: inherit;" placeholder="Type your explanation or solution here..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button id="publish-solution-btn" class="btn btn-primary">Publish & Resolve</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Lightbox Overlay -->
+    <div id="image-lightbox" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; cursor: pointer;">
+        <img id="lightbox-img" src="" style="max-width: 90%; max-height: 90%; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+        <button id="close-lightbox-btn" style="position: absolute; top: 20px; right: 20px; background: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+    </div>
+
+    <!-- Student Detail Modal -->
+    <div id="student-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; backdrop-filter: blur(5px);">
+        <div class="panel" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                <div>
+                    <h2 id="modal-student-name" style="margin: 0; font-size: 1.5rem; color: var(--primary);">Student Name</h2>
+                    <p id="modal-student-id" style="color: var(--text-body); margin-top: 5px;">Register No: ---</p>
+                </div>
+                <button id="close-modal-btn" class="btn btn-secondary" style="width: auto; padding: 10px 15px;">Close</button>
+            </div>
+
+            <h3 style="font-size: 1rem; margin-bottom: 1rem;">Attendance Timeline</h3>
+            <ul id="modal-attendance-list" class="flagged-list">
+                <!-- Populated via JS -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div id="about-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; backdrop-filter: blur(8px);">
+        <div class="panel" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 500px; text-align: center;">
+            <h2 style="color: var(--primary); margin-bottom: 10px;">About Acadly</h2>
+            <p style="color: var(--text-body); font-weight: 600; margin-bottom: 20px;">Created by Team <span style="color: var(--primary);">DIGIX</span></p>
+
+            <div style="background: var(--bg-main); padding: 20px; border-radius: 20px; margin-bottom: 25px; border: 1px solid var(--border-light);">
+                <h4 style="margin-bottom: 15px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-body);">Team Members</h4>
+                <ul style="list-style: none; padding: 0; color: var(--text-heading); font-weight: 700; line-height: 2;">
+                    <li>Dhruv Upadhyaya</li>
+                    <li>Lakshya Pundir</li>
+                    <li>Sarthak Agrawal</li>
+                    <li>Vinayak Tripathi</li>
+                </ul>
+                <p style="margin-top: 15px; font-size: 0.85rem; color: var(--primary); font-weight: 600;">VIT Chennai</p>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <p style="font-size: 0.85rem; color: var(--text-body);">For support, contact us at:</p>
+                <a href="mailto:acadlysup@gmail.com" style="color: var(--primary); font-weight: 700; text-decoration: none;">acadlysup@gmail.com</a>
+            </div>
+
+            <button id="close-about-btn" class="btn btn-primary">Close</button>
+        </div>
+    </div>
+
+    <!-- Success Popup -->
+    <div id="success-popup" style="display: none; position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 15px 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 9999; font-weight: 700; animation: slideInDown 0.4s ease;">
+        Password updated successfully!
+    </div>
+
+    <style>
+        @keyframes slideInDown {
+            from { transform: translate(-50%, -100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
+
+        /* Initial display: none for JS-controlled modals if not handled by inline style */
+        #image-lightbox {
+            display: none !important;
+        }
+        #image-lightbox.active {
+            display: flex !important;
+        }
+    </style>
+
+    <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
